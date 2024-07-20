@@ -11,3 +11,5 @@ public_url = "./"
 no_spa = true
 # Open a browser tab once the initial build is complete.
 open = true
+# Bug in trunk? the default host of "::1" fails to open the browser on windows cmd start "http://[::1]:{port}/" works though
+# addresses = ["127.0.0.1", "::1"]
