@@ -37,6 +37,7 @@ fn enter_credits(mut commands: Commands) {
             children.header("Assets");
             children.label("Bevy logo - All rights reserved by the Bevy Foundation. Permission granted for splash screen use when unmodified.");
             children.label("Ducky sprite - CC0 by Caz Creates Games");
+            children.label("Codon Chart - public domain https://commons.wikimedia.org/wiki/File:Aminoacids_table.svg");
             children.label("Music - CC BY 3.0 by Kevin MacLeod");
 
             children.button("Back").insert(CreditsAction::Back);
