@@ -8,6 +8,7 @@ use bevy::{
     asset::AssetMetaCheck,
     audio::{AudioPlugin, Volume},
     prelude::*,
+    render::view::visibility::RenderLayers,
 };
 
 pub struct AppPlugin;
@@ -77,7 +78,11 @@ enum AppSet {
 fn spawn_camera(mut commands: Commands) {
     commands.spawn((
         Name::new("Camera"),
-        Camera2dBundle::default(),
+        Camera3dBundle {
+            transform: Transform::from_xyz(0.0, 0.0, 40.0).looking_at(Vec3::ZERO, Vec3::Y),
+            ..default()
+        },
+        RenderLayers::from_layers(&[0, 1]),
         // Render all UI to this camera.
         // Not strictly necessary since we only use one camera,
         // but if we don't use this component, our UI will disappear as soon

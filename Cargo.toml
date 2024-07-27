@@ -6,11 +6,22 @@ edition = "2021"
 
 [dependencies]
 bevy = { version = "0.14", features = ["wayland"] }
+bevy-inspector-egui = "0.25.1"
+bevy_egui = { version = "0.28.0", default-features = false, features = [
+    "immutable_ctx",
+    "open_url",
+    "default_fonts",
+    "render",
+    "serde",
+] }
+#"manage_clipboard",
+
 # Disable low-severity logs at compile time for performance.
 log = { version = "0.4", features = [
     "max_level_debug",
     "release_max_level_warn",
 ] }
+noise = "0.9.0"
 rand = "0.8"
 
 [features]

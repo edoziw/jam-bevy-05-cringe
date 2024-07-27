@@ -1,6 +1,8 @@
 based on https://github.com/TheBevyFlock/bevy_quickstart
 
 # Bevy game jam 05
+## todo
+- could listen to OnAdd for Observer and inject a Name component on the entity
 
 <details>
   <summary>todo</summary>
