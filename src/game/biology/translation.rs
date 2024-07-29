@@ -1,3 +1,5 @@
+use crate::game::assets::Scene3dKey;
+
 use super::Codon;
 
 pub struct NucleobaseRnaToAminoChar {
@@ -9,7 +11,7 @@ impl NucleobaseRnaToAminoChar {
     }
 }
 
-enum TranslationMode {
+pub enum TranslationMode {
     Real,
     TokiPona,
 }
@@ -112,8 +114,58 @@ impl NucleobaseRnaToAminoChar {
         };
         Self { table }
     }
-    pub fn traslation(&self, codon: &Codon) -> char {
+    pub fn translation(&self, codon: &Codon) -> char {
         self.table[codon.i0()][codon.i1()][codon.i2()]
+    }
+    pub fn scene_3d_key(&self, c: char) -> Scene3dKey {
+        match c {
+            '-' => Scene3dKey::Minus,
+            '_' => Scene3dKey::Underscore,
+            '^' => Scene3dKey::Carrot,
+            ',' => Scene3dKey::Comma,
+            '!' => Scene3dKey::Exclamation,
+            '.' => Scene3dKey::Period,
+            '+' => Scene3dKey::Plus,
+            '?' => Scene3dKey::Question,
+            '/' => Scene3dKey::Slash,
+            '*' => Scene3dKey::Star,
+            '0' => Scene3dKey::Digit0,
+            '1' => Scene3dKey::Digit1,
+            '2' => Scene3dKey::Digit2,
+            '3' => Scene3dKey::Digit3,
+            'A' => Scene3dKey::A,
+            'a' => Scene3dKey::ALower,
+            'C' => Scene3dKey::C,
+            'E' => Scene3dKey::E,
+            'e' => Scene3dKey::ELower,
+            'G' => Scene3dKey::G,
+            'I' => Scene3dKey::I,
+            'i' => Scene3dKey::ILower,
+            'J' => Scene3dKey::J,
+            'j' => Scene3dKey::JLower,
+            'K' => Scene3dKey::K,
+            'k' => Scene3dKey::KLower,
+            'L' => Scene3dKey::L,
+            'l' => Scene3dKey::LLower,
+            'M' => Scene3dKey::M,
+            'm' => Scene3dKey::MLower,
+            'N' => Scene3dKey::N,
+            'n' => Scene3dKey::NLower,
+            'O' => Scene3dKey::O,
+            'o' => Scene3dKey::OLower,
+            'P' => Scene3dKey::P,
+            'p' => Scene3dKey::PLower,
+            'S' => Scene3dKey::S,
+            's' => Scene3dKey::SLower,
+            'T' => Scene3dKey::T,
+            't' => Scene3dKey::TLower,
+            'U' => Scene3dKey::U,
+            'u' => Scene3dKey::ULower,
+            'W' => Scene3dKey::W,
+            'w' => Scene3dKey::WLower,
+
+            _ => panic!("unexpected translation {}", c),
+        }
     }
 }
 
@@ -208,14 +260,14 @@ mod test {
             CodonAcids::new(Codon::new('G', 'G', 'G'), 'G', '!'),
         ];
         for e in values.iter() {
-            let result = table_real.traslation(&e.codon);
+            let result = table_real.translation(&e.codon);
             let expected_char = e.expected_real;
             assert_eq!(
                 result, expected_char,
                 "we are testing translation to real acids with {:?}, expecting acid {}, got {}",
                 e.codon, expected_char, result
             );
-            let result = table_toki.traslation(&e.codon);
+            let result = table_toki.translation(&e.codon);
             let expected_char = e.expected_toki;
             assert_eq!(
                 result, expected_char,

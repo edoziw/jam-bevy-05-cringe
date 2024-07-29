@@ -5,11 +5,13 @@ use bevy_sprite3d::{Sprite3d, Sprite3dParams};
 
 use crate::{
     game::assets::{HandleMap, ImageKey},
+    game::cells::text::spawn_codon_gltfs,
     screen::Screen,
 };
 
 pub(super) fn plugin(app: &mut App) {
     app.observe(spawn_codon_chart);
+    app.observe(spawn_codon_gltfs);
     app.register_type::<CodonChart>();
 }
 
@@ -26,14 +28,14 @@ fn spawn_codon_chart(
     image_handles: Res<HandleMap<ImageKey>>,
     mut sprite_params: Sprite3dParams,
 ) {
-    let fudge = 50.;
+    let fudge = 40.;
     commands.spawn((
         Name::new("CodonChart"),
         CodonChart,
         Sprite3d {
             image: image_handles[&ImageKey::CodonChart].clone_weak(),
             pixels_per_metre: 400.,
-            transform: Transform::from_translation(vec3(0.0, 0.0, -fudge))
+            transform: Transform::from_translation(vec3(0.0, 0.7, -fudge))
                 .with_scale(vec3(fudge, fudge, 1.0)),
             ..default()
         }

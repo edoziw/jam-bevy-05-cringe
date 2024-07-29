@@ -18,5 +18,6 @@ pub(super) fn plugin(app: &mut App) {
         movement::plugin,
         spawn::plugin,
         cells::plugin,
+        biology::plugin,
     ));
 }
