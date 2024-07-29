@@ -129,7 +129,7 @@ jobs:
         if: ${{ matrix.platform != 'web' }}
         run: |
           for target in ${{ matrix.targets }}; do
-            cargo build --cfg=web_sys_unstable_apis --profile='${{ matrix.profile }}' --target="${target}" --no-default-features --features='${{ matrix.features }}'
+            cargo --cfg=web_sys_unstable_apis build --profile='${{ matrix.profile }}' --target="${target}" --no-default-features --features='${{ matrix.features }}'
             mv target/"${target}"/'${{ matrix.profile }}/${{ env.BINARY }}${{ matrix.binary_ext }}' tmp/binary/"${target}"'${{ matrix.binary_ext }}'
           done
 
