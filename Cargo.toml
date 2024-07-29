@@ -14,6 +14,7 @@ bevy_egui = { version = "0.28.0", default-features = false, features = [
     "render",
     "serde",
 ] }
+bevy_sprite3d = "3.0.0"
 #"manage_clipboard",
 
 # Disable low-severity logs at compile time for performance.

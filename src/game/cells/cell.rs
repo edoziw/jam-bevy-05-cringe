@@ -1,39 +1,19 @@
-use std::default;
-
 use bevy::{
-    color::palettes::css::{ORANGE, RED, WHITE},
+    color::palettes::css::{ORANGE, WHITE},
     math::vec3,
     prelude::*,
+    render::view::visibility::RenderLayers,
 };
 use noise::{NoiseFn, OpenSimplex};
 
-pub(super) fn plugin(app: &mut App) {
-    //app.init_resource::<MyAssetPack>();
-    app.add_systems(Startup, (spawn_gltf, spawn_cell).chain());
-    app.add_systems(Update, draw_cell);
-}
-
-fn spawn_gltf(mut commands: Commands, ass: Res<AssetServer>) {
-    // note that we have to include the `Scene0` label
-    let my_gltf = ass.load("3d/text-3d-A.glb#Scene0");
-
-    // to position our 3d model, simply use the Transform
-    // in the SceneBundle
-    commands.spawn(SceneBundle {
-        scene: my_gltf,
-        transform: Transform::from_xyz(2.0, 0.0, -5.0),
-        ..Default::default()
-    });
-}
-
 #[derive(Component)]
-struct Curve {
+pub struct Curve {
     curve: CubicBezier<Vec3>,
     noise: OpenSimplex,
 }
 
 #[derive(Component)]
-struct Eye {}
+pub struct Eye {}
 
 impl Default for Curve {
     fn default() -> Self {
@@ -98,7 +78,7 @@ fn noise_point(noise_fn: &OpenSimplex, time: &Res<Time>, point: Vec3) -> Vec3 {
     )
 }
 #[derive(Bundle)]
-struct EyeBundle {
+pub struct EyeBundle {
     pbr_bundle: PbrBundle,
     name: Name,
     eye: Eye,
@@ -120,10 +100,11 @@ impl EyeBundle {
     }
 }
 #[derive(Bundle)]
-struct CellBundle {
+pub struct CellBundle {
     curve: Curve,
     name: Name,
     spatial_bundle: SpatialBundle,
+    render_layer: RenderLayers,
 }
 
 impl CellBundle {
@@ -135,29 +116,12 @@ impl CellBundle {
             },
             curve: Curve::default(),
             name: Name::new("cell"),
+            render_layer: RenderLayers::layer(1),
         }
     }
 }
 
-fn spawn_cell(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    let x = 4.;
-    commands
-        .spawn(CellBundle::new(Transform::from_xyz(x, 0., 0.)))
-        .with_children(|parent| {
-            parent.spawn(EyeBundle::new(&mut meshes, &mut materials));
-        });
-    commands
-        .spawn(CellBundle::new(Transform::from_xyz(-x, 0., 0.)))
-        .with_children(|parent| {
-            parent.spawn(EyeBundle::new(&mut meshes, &mut materials));
-        });
-}
-
-fn draw_cell(
+pub fn draw_cell(
     time: Res<Time>,
     mut eye_q: Query<(&Parent, &mut Transform), With<Eye>>,
     mut cell_q: Query<(&GlobalTransform, &Curve)>,
@@ -189,6 +153,7 @@ fn draw_cell(
         }
     }
 }
+
 fn transform_curve(curve: &mut CubicBezier<Vec3>, transform: &Transform) {
     curve.control_points.iter_mut().for_each(|control_points| {
         control_points
@@ -196,37 +161,3 @@ fn transform_curve(curve: &mut CubicBezier<Vec3>, transform: &Transform) {
             .for_each(|point| *point = transform.transform_point(*point));
     });
 }
-/*
-/// Helper resource for tracking our asset
-#[derive(Resource)]
-struct MyAssetPack(Handle<Gltf>);
-
-fn load_gltf(mut commands: Commands, ass: Res<AssetServer>) {
-    let gltf = ass.load("my_asset_pack.glb");
-    commands.insert_resource(MyAssetPack(gltf));
-}
-
-fn spawn_gltf_objects(
-    mut commands: Commands,
-    my: Res<MyAssetPack>,
-    assets_gltf: Res<Assets<Gltf>>,
-) {
-    // if the GLTF has loaded, we can navigate its contents
-    if let Some(gltf) = assets_gltf.get(&my.0) {
-        // spawn the first scene in the file
-        commands.spawn(SceneBundle {
-            scene: gltf.scenes[0].clone(),
-            ..Default::default()
-        });
-
-        // spawn the scene named "YellowCar"
-        commands.spawn(SceneBundle {
-            scene: gltf.named_scenes["YellowCar"].clone(),
-            transform: Transform::from_xyz(1.0, 2.0, 3.0),
-            ..Default::default()
-        });
-
-        // PERF: the `.clone()`s are just for asset handles, don't worry :)
-    }
-}
- */

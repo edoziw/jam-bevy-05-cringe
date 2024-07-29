@@ -10,6 +10,7 @@ use bevy::{
     prelude::*,
     render::view::visibility::RenderLayers,
 };
+use bevy_sprite3d::Sprite3dPlugin;
 
 pub struct AppPlugin;
 
@@ -21,11 +22,12 @@ impl Plugin for AppPlugin {
             (AppSet::TickTimers, AppSet::RecordInput, AppSet::Update).chain(),
         );
 
-        // Spawn the main camera.
-        app.add_systems(Startup, spawn_camera);
+        // Spawn the cameras.
+        app.add_systems(Startup, spawn_cameras);
+        app.add_systems(Update, clone_camera_transforms);
 
         // Add Bevy plugins.
-        app.add_plugins(
+        app.add_plugins((
             DefaultPlugins
                 .set(AssetPlugin {
                     // Wasm builds will check for meta files (that don't exist) if this isn't set.
@@ -51,7 +53,8 @@ impl Plugin for AppPlugin {
                     },
                     ..default()
                 }),
-        );
+            Sprite3dPlugin,
+        ));
 
         // Add other plugins.
         app.add_plugins((game::plugin, screen::plugin, ui::plugin));
@@ -75,14 +78,36 @@ enum AppSet {
     Update,
 }
 
-fn spawn_camera(mut commands: Commands) {
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Reflect)]
+struct FollowUiCamera;
+
+fn spawn_cameras(mut commands: Commands) {
     commands.spawn((
-        Name::new("Camera"),
+        Name::new("Camera0"),
         Camera3dBundle {
+            camera: Camera {
+                order: 0,
+                ..default()
+            },
             transform: Transform::from_xyz(0.0, 0.0, 40.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
-        RenderLayers::from_layers(&[0, 1]),
+        // background camera layer 0
+        RenderLayers::from_layers(&[0]),
+        FollowUiCamera,
+    ));
+    commands.spawn((
+        Name::new("Camera1"),
+        Camera3dBundle {
+            camera: Camera {
+                order: 1,
+                ..default()
+            },
+            transform: Transform::from_xyz(0.0, 0.0, 40.0).looking_at(Vec3::ZERO, Vec3::Y),
+            ..default()
+        },
+        // foreground camera layer 1
+        RenderLayers::from_layers(&[1]),
         // Render all UI to this camera.
         // Not strictly necessary since we only use one camera,
         // but if we don't use this component, our UI will disappear as soon
@@ -91,4 +116,15 @@ fn spawn_camera(mut commands: Commands) {
         // for debugging. So it's good to have this here for future-proofing.
         IsDefaultUiCamera,
     ));
+}
+
+// camera3dBundle with component IsDefaultUICamera 's transform should be copied to camera3dBundle with component FollowUiCamera
+// there is only one of each type of camera so use let Ok form
+fn clone_camera_transforms(
+    ui_cameras: Query<(Entity, &Transform), With<IsDefaultUiCamera>>,
+    mut follow_cameras: Query<&mut Transform, (With<FollowUiCamera>, Without<IsDefaultUiCamera>)>,
+) {
+    let (_, ui_transform) = ui_cameras.single();
+    let mut follow_transform = follow_cameras.single_mut();
+    *follow_transform = *ui_transform;
 }
