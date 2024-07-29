@@ -32,6 +32,7 @@ env:
   # Before enabling LFS, please take a look at GitHub's documentation for costs and quota limits:
   # https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-storage-and-bandwidth-usage
   USE_GIT_LFS: false
+  RUST_FLAGS: "--cfg=web_sys_unstable_apis"
 jobs:
   # Determine the version number for this workflow.
   get-version:
